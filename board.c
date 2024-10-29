@@ -29,7 +29,7 @@ int board_get_cell(struct board *board, int row, int col)
         fprintf(stderr, "invalid cell (%d, %d)\n", row, col);
         return -1;
     }
-    return board->cells[row * board->box_width + col];
+    return board->cells[row * board->width + col];
 }
 
 void board_set_cell(struct board *board, int row, int col, int value)
@@ -38,7 +38,7 @@ void board_set_cell(struct board *board, int row, int col, int value)
     {
         fprintf(stderr, "invalid cell (%d, %d)\n", row, col);
     }
-    board->cells[row * board->box_width + col] = value;
+    board->cells[row * board->width + col] = value;
 }
 
 
@@ -78,7 +78,7 @@ void print_row(struct board* board, int row)
         }
         printw("| ");
         attroff(A_BOLD);
-        printw("%d ", board_get_cell(board, row, i));
+        printw("%d ", board_get_cell(board, i, row));
     }
     attron(A_BOLD);
     printw("|\n");

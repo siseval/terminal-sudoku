@@ -34,6 +34,7 @@ void run_loop(struct board* board)
     while (true)
     {
         handle_input(board);
+        board_set_cell(board, 4, 4, rand() % 9 + 1);
         board_print(board);
     }
 }
