@@ -22,23 +22,23 @@ void board_destroy(struct board* board)
 }
 
 
-int board_get_cell(struct board *board, int row, int col)
+int board_get_cell(struct board *board, int col, int row)
 {
-    if (row < 0 || row >= board->width || col < 0 || col >= board->height)
+    if (col < 0 || col >= board->width || row < 0 || row >= board->height)
     {
-        fprintf(stderr, "invalid cell (%d, %d)\n", row, col);
+        fprintf(stderr, "invalid cell (%d, %d)\n", col, row);
         return -1;
     }
-    return board->cells[row * board->width + col];
+    return board->cells[col * board->width + row];
 }
 
-void board_set_cell(struct board *board, int row, int col, int value)
+void board_set_cell(struct board *board, int col, int row, int value)
 {
-    if (row < 0 || row >= board->width || col < 0 || col >= board->height)
+    if (col < 0 || col >= board->width || row < 0 || row >= board->height)
     {
-        fprintf(stderr, "invalid cell (%d, %d)\n", row, col);
+        fprintf(stderr, "invalid cell (%d, %d)\n", col, row);
     }
-    board->cells[row * board->width + col] = value;
+    board->cells[col * board->width + row] = value;
 }
 
 
