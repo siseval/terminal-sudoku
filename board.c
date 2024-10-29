@@ -42,24 +42,28 @@ void board_set_cell(struct board *board, int row, int col, int value)
 }
 
 
-void print_hor_line(struct board* board, bool bold)
+void print_hor_line(struct board* board, bool is_hor_edge)
 {
     move_center_h(-((board->width * 4 + 1) / 2));
     for (int i = 0; i < board->width; i++)
     {
-        if (bold || ((i) % board->box_width == 0)) 
+        bool is_vert_edge = i % board->box_width == 0;
+        if (is_hor_edge || is_vert_edge)
         { 
             attron(A_BOLD); 
         }
-        printw(bold && !((i) % board->box_width == 0) ? "-" : "|");
-        if (!bold)
+
+        char edge_symbols[2][2] = { {' ', '|'}, { '-', '+' } };
+        printw("%c", edge_symbols[is_hor_edge][is_vert_edge]);
+
+        if (!is_hor_edge)
         {
             attroff(A_BOLD);
         }
         printw("---");
     }
     attron(A_BOLD);
-    printw("|\n");
+    printw(is_hor_edge ? "+\n" : "|\n");
     attroff(A_BOLD);
 }
 
