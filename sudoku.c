@@ -25,17 +25,24 @@ void init_curses()
 
 void run()
 {
-    struct board* board = board_create(3);    
+    struct board* board = board_create(3);
     run_loop(board);
 }
 
 void run_loop(struct board* board)
 {
+    int i = 0;
     while (true)
     {
         handle_input(board);
-        board_set_cell(board, 4, 4, rand() % 9 + 1);
+        board_set_box_cell(board, 0, 0, i % 3, i / 3, i % 4 + 1);
+        if (i >= 8 && board_check_box(board, 0, 0))
+        {
+            exit(0);
+        }
+        // board_set_box_cell(board, 1, 1, 1, 2, rand() % 9 + 1);
         board_print(board);
+        i++;
     }
 }
 
