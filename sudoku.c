@@ -42,6 +42,20 @@ void run_loop(struct board* board)
 
 void handle_input(struct board* board)
 {
-    getch();
+    switch (getch())
+    {
+        case 'h':
+        case 'a':
+            break;
+        case 'l':
+        case 'd':
+            break;
+        case 'k':
+        case 'w':
+            break;
+        case 'j':
+        case 's':
+            break;
+    }
 }
 
