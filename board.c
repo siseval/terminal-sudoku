@@ -45,7 +45,14 @@ static bool check_has_numbers(bool has_numbers[], int length)
 
 bool board_check_all(struct board* board)
 {
-
+    for (int i = 0; i < board->height; i++)
+    {
+        if (!board_check_row(board, i) || !board_check_col(board, i) || !board_check_box(board, i % board->box_width, i / board->box_height))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool board_check_row(struct board* board, int row)
@@ -132,6 +139,7 @@ void board_set_cell(struct board* board, int col, int row, int value)
     if (is_out_of_bounds(col, row, board->width, board->height))
     {
         fprintf(stderr, "invalid cell (%d, %d)\n", col, row);
+        return;
     }
     board->cells[row * board->width + col] = value;
 }
@@ -141,10 +149,12 @@ void board_set_box_cell(struct board* board, int box_x, int box_y, int box_col, 
     if (is_out_of_bounds(box_col, box_row, board->box_width, board->box_height))
     {
         fprintf(stderr, "invalid box cell (%d, %d)\n", box_col, box_row);
+        return;
     }
     if (is_out_of_bounds(box_x, box_y, board->box_width, board->box_height))
     {
         fprintf(stderr, "invalid box (%d, %d)\n", box_col, box_row);
+        return;
     }
     board->cells[(box_y * board->box_width * board->width) + (box_x * board->box_width) + (box_row * board->width) + (box_col)] = value;
 }
