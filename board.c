@@ -34,12 +34,28 @@ void board_destroy(struct board* board)
 
 void board_generate_puzzle(struct board* board, const int num_clues)
 {
+
     int nums_tried[board->width * board->height];
     memset(nums_tried, 0, sizeof(int) * board->width * board->height);
+
+    int check_order[board->width];
+    for (int i = 1; i <= board->width; i++)
+    {
+        check_order[i - 1] = i;
+    }
 
     int cell_index = 0;
     while (cell_index < board->width * board->height)
     {
+        for (int i = 0; i < board->width * 3; i++)
+        {
+            int pos1 = rand() % board->width;
+            int pos2 = rand() % board->width;
+            int buf = check_order[pos1];
+            check_order[pos1] = check_order[pos2];
+            check_order[pos2] = buf;
+        }
+
         bool all_tried = nums_tried[cell_index] == board->width;
 
         if (all_tried)
@@ -53,7 +69,7 @@ void board_generate_puzzle(struct board* board, const int num_clues)
             continue;
         }
 
-        int candidate_num = 1 + nums_tried[cell_index];
+        int candidate_num = check_order[nums_tried[cell_index]];
 
         board->cells[cell_index] = candidate_num;
         nums_tried[cell_index]++;

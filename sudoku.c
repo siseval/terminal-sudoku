@@ -32,7 +32,7 @@ void run()
 
 void main_loop(struct board* board)
 {
-    board_generate_puzzle(board, 20);
+    board_generate_puzzle(board, 81);
     board_print(board);
     while (true)
     {
