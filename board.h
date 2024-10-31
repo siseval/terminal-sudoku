@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <curses.h>
 #include "cli.h"
-#define REFRESH_MS 1
+#define REFRESH_MS 500
 
 struct board
 {

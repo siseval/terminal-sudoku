@@ -40,8 +40,6 @@ void board_generate_puzzle(struct board* board, const int num_clues)
     int cell_index = 0;
     while (cell_index < board->width * board->height)
     {
-        getch();
-        board_print(board);
         bool all_tried = nums_tried[cell_index] == board->width;
 
         if (all_tried)
@@ -67,6 +65,17 @@ void board_generate_puzzle(struct board* board, const int num_clues)
         }
 
         cell_index++;
+    }
+
+    for (int i = 0; i < board->width * board->height - num_clues; i++)
+    {
+        int cell_index = -1; 
+        while (cell_index == -1)
+        {
+            int candidate_index = rand() % (board->width * board->height);
+            cell_index = board->cells[candidate_index] != 0 ? candidate_index : -1;
+        }
+        board->cells[cell_index] = 0;
     }
 }
 
@@ -201,7 +210,7 @@ int board_box_status(const struct board* board, const int box_x, const int box_y
         {
             return -1;
         }
-        box_has_numbers[board_get_cell(board, i, box_y)] = true;
+        box_has_numbers[board_get_box_cell(board, box_x, box_y, i % board->box_width, i / board->box_height)] = true;
     }
     return !box_has_numbers[0];
 }

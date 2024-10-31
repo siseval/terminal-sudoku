@@ -26,13 +26,13 @@ void init_curses()
 
 void run()
 {
-    struct board* board = board_create(2);
+    struct board* board = board_create(3);
     main_loop(board);
 }
 
 void main_loop(struct board* board)
 {
-    board_generate_puzzle(board, 30);
+    board_generate_puzzle(board, 20);
     board_print(board);
     while (true)
     {
