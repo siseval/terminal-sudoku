@@ -1,4 +1,5 @@
 #include "sudoku.h"
+#include "board.h"
 
 int main()
 {
@@ -25,18 +26,18 @@ void init_curses()
 
 void run()
 {
-    struct board* board = board_create(3);
-    run_loop(board);
+    struct board* board = board_create(2);
+    main_loop(board);
 }
 
-void run_loop(struct board* board)
+void main_loop(struct board* board)
 {
-    int i = 0;
+    board_generate_puzzle(board, 30);
+    board_print(board);
     while (true)
     {
         handle_input(board);
         board_print(board);
-        i++;
     }
 }
 
@@ -46,6 +47,7 @@ void handle_input(struct board* board)
     {
         case 'h':
         case 'a':
+
             break;
         case 'l':
         case 'd':

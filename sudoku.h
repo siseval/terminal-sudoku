@@ -10,7 +10,7 @@
 void init_curses();
 
 void run();
-void run_loop(struct board* board);
+void main_loop(struct board* board);
 
 void handle_input(struct board* board);
 

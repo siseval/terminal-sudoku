@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <curses.h>
 #include "cli.h"
-#define REFRESH_MS 500
+#define REFRESH_MS 1
 
 struct board
 {
@@ -27,12 +27,16 @@ struct board
 struct board* board_create(const int box_dimensions);
 void board_destroy(struct board* board);
 
-void board_fill(struct board* board, const int num_clues);
+void board_generate_puzzle(struct board* board, const int num_clues);
+
+int board_highest_status(struct board* board);
+int board_lowest_status(struct board* board);
 
 void board_update_statuses(struct board* board);
-int board_row_status(const struct board* board, const int row);
 int board_col_status(const struct board* board, const int col);
+int board_row_status(const struct board* board, const int row);
 int board_box_status(const struct board* board, const int box_x, const int box_y);
+int board_cell_lowest_status(const struct board* board, const int col, const int row);
 
 int board_get_cell(const struct board* board, const int row, const int col);
 int board_get_box_cell(const struct board* board, const int box_x, const int box_y, const int box_col, const int box_row);

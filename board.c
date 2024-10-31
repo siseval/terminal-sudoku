@@ -22,33 +22,117 @@ struct board* board_create(const int box_dimensions)
     return board;
 }
 
-void board_destroy(struct board* board)
+void board_destroy(struct board* board) 
 {
     free(board->cells);
+    free(board->col_statuses);
+    free(board->row_statuses);
+    free(board->box_statuses);
     free(board);
 }
 
 
-void board_fill(struct board* board, const int num_clues)
+void board_generate_puzzle(struct board* board, const int num_clues)
 {
-    for (int i = 0; i < num_clues; i++)
+    int nums_tried[board->width * board->height];
+    memset(nums_tried, 0, sizeof(int) * board->width * board->height);
+
+    int cell_index = 0;
+    while (cell_index < board->width * board->height)
     {
-        
+        getch();
+        board_print(board);
+        bool all_tried = nums_tried[cell_index] == board->width;
+
+        if (all_tried)
+        {
+            nums_tried[cell_index] = 0;
+            board->cells[cell_index] = 0;
+            if (cell_index > 0)
+            {
+                cell_index--;
+            }
+            continue;
+        }
+
+        int candidate_num = 1 + nums_tried[cell_index];
+
+        board->cells[cell_index] = candidate_num;
+        nums_tried[cell_index]++;
+
+        bool failed = board_cell_lowest_status(board, cell_index % board->width, cell_index / board->height) == -1;
+        if (failed)
+        {
+            continue;
+        }
+
+        cell_index++;
     }
 }
 
 
-static int check_has_numbers(const bool has_numbers[], const int length)
+int board_highest_status(struct board* board)
 {
-    for (int i = 0; i < length; i++)
+    board_update_statuses(board);
+    int highest = -1;
+    for (int i = 0; i < board->width; i++)
     {
-        if (has_numbers[i] == false)
+        int col_status = board->col_statuses[i];
+        int row_status = board->row_statuses[i];
+        int box_status = board->box_statuses[i];
+
+        if (col_status == 1 || row_status == 1 || box_status == 1)
+        {
+            return 1;
+        }
+
+        if (col_status > highest)
+        {
+            highest = col_status;
+        }
+        if (row_status > highest)
+        {
+            highest = row_status;
+        }
+        if (box_status > highest)
+        {
+            highest = box_status;
+        }
+    }
+    return highest;
+}
+
+int board_lowest_status(struct board* board)
+{
+    board_update_statuses(board);
+    int lowest = 1;
+    for (int i = 0; i < board->width; i++)
+    {
+        int col_status = board->col_statuses[i];
+        int row_status = board->row_statuses[i];
+        int box_status = board->box_statuses[i];
+
+        if (col_status == -1 || row_status == -1 || box_status == -1)
         {
             return -1;
         }
+
+        if (col_status < lowest)
+        {
+            lowest = col_status;
+        }
+        if (row_status < lowest)
+        {
+            lowest = row_status;
+        }
+        if (box_status < lowest)
+        {
+            lowest = box_status;
+        }
     }
-    return 1;
+    return lowest;
 }
+
 
 void board_update_statuses(struct board* board)
 {
@@ -60,52 +144,66 @@ void board_update_statuses(struct board* board)
     }
 }
 
-int board_row_status(const struct board* board, const int row)
+
+int board_cell_lowest_status(const struct board* board, const int col, const int row)
 {
-    bool row_has_numbers[board->width];
-    memset(row_has_numbers, false, sizeof(row_has_numbers));
-    for (int i = 0; i < board->width; i++)
-    {
-        int cell_number = board_get_cell(board, i, row);
-        if (cell_number == 0)
-        {
-            return 0;
-        }
-        row_has_numbers[cell_number - 1] = true;
-    }
-    return check_has_numbers(row_has_numbers, board->width);
+    int lowest = 1;
+    int col_status = board_col_status(board, col);
+    int row_status = board_row_status(board, row);
+    int box_status = board_box_status(board, col / board->box_width, row / board->box_height);
+    if (col_status < lowest) { lowest = col_status; }
+    if (row_status < lowest) { lowest = row_status; }
+    if (box_status < lowest) { lowest = box_status; }
+    return lowest;
+
 }
 
 int board_col_status(const struct board* board, const int col)
 {
-    bool col_has_numbers[board->height];
+    bool col_has_numbers[board->width + 1];
     memset(col_has_numbers, false, sizeof(col_has_numbers));
-    for (int i = 0; i < board->height; i++)
+    for (int i = 0; i < board->width; i++)
     {
         int cell_number = board_get_cell(board, col, i);
-        if (cell_number == 0)
+        if (cell_number != 0 && col_has_numbers[cell_number])
         {
-            return 0;
+            return -1;
         }
-        col_has_numbers[cell_number - 1] = true;
+        col_has_numbers[cell_number] = true;
     }
-    return check_has_numbers(col_has_numbers, board->height);
+    return !col_has_numbers[0];
+}
+
+int board_row_status(const struct board* board, const int row)
+{
+    bool row_has_numbers[board->height + 1];
+    memset(row_has_numbers, false, sizeof(row_has_numbers));
+    for (int i = 0; i < board->height; i++)
+    {
+        int cell_number = board_get_cell(board, i, row);
+        if (cell_number != 0 && row_has_numbers[cell_number])
+        {
+            return -1;
+        }
+        row_has_numbers[cell_number] = true;
+    }
+    return !row_has_numbers[0];
 }
 
 int board_box_status(const struct board* board, const int box_x, const int box_y)
 {
-    bool box_has_numbers[board->width];
+    bool box_has_numbers[board->width + 1];
     memset(box_has_numbers, false, sizeof(box_has_numbers));
     for (int i = 0; i < board->width; i++)
     {
-        int cell_number = board_get_box_cell(board, box_x, box_y, i % 3, box_y / 3);
-        if (cell_number == 0)
+        int cell_number = board_get_box_cell(board, box_x, box_y, i % board->box_width, i / board->box_height);
+        if (cell_number != 0 && box_has_numbers[cell_number])
         {
-            return 0;
+            return -1;
         }
-        box_has_numbers[board_get_cell(board, i, box_y) - 1] = true;
+        box_has_numbers[board_get_cell(board, i, box_y)] = true;
     }
-    return check_has_numbers(box_has_numbers, board->width);    
+    return !box_has_numbers[0];
 }
 
 
