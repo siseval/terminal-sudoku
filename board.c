@@ -14,6 +14,9 @@ struct board* board_create(const int box_dimensions)
     board->row_statuses = calloc(1, sizeof(int) * board->width);
     board->box_statuses = calloc(1, sizeof(int) * board->box_width * board->box_height);
 
+    board->clues_positions = calloc(1, sizeof(int) * 2 * board->width * board->height);
+    board->num_clues = 0;
+
     board->cursor_pos[0] = 0;
     board->cursor_pos[1] = 0;
 
@@ -34,7 +37,6 @@ void board_destroy(struct board* board)
 
 void board_generate_puzzle(struct board* board, const int num_clues)
 {
-
     int nums_tried[board->width * board->height];
     memset(nums_tried, 0, sizeof(int) * board->width * board->height);
 
@@ -93,6 +95,16 @@ void board_generate_puzzle(struct board* board, const int num_clues)
         }
         board->cells[cell_index] = 0;
     }
+    for (int i = 0; i < board->width * board->height; i++)
+    {
+        if (board->cells[i] != 0)
+        {
+            board->clues_positions[i][0] = i % board->width;
+            board->clues_positions[i][1] = i / board->width;
+        }
+    }
+
+    board->num_clues = num_clues;
 }
 
 
@@ -287,6 +299,21 @@ void board_set_box_cell(struct board* board, const int box_x, const int box_y, c
     board->cells[(box_y * board->box_width * board->width) + (box_x * board->box_width) + (box_row * board->width) + (box_col)] = value;
 }
 
+bool board_try_set_cell(struct board* board, const int col, const int row, const int value)
+{
+
+}
+
+void board_move_cursor(struct board* board, const int dx, const int dy)
+{
+    if (is_out_of_bounds(board->cursor_pos[0] + dx, board->cursor_pos[1] + dy, board->width, board->height))
+    {
+        return;
+    }
+    board->cursor_pos[0] += dx;
+    board->cursor_pos[1] += dy;
+}
+
 
 static void print_hor_line(const struct board* board, const bool is_hor_edge)
 {
@@ -313,6 +340,18 @@ static void print_hor_line(const struct board* board, const bool is_hor_edge)
     attroff(A_BOLD);
 }
 
+static bool is_clue_pos(const struct board* board, const int col, const int row)
+{
+    for (int i = 0; i < board->num_clues; i++)
+    {
+        if (board->clues_positions[i][0] == col && board->clues_positions[i][1] == row)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 static void print_row(const struct board* board, const int row)
 {
     move_center_h(-((board->width * 4 + 1) / 2));
@@ -323,9 +362,23 @@ static void print_row(const struct board* board, const int row)
             attron(A_BOLD);
         }
         printw("| ");
+
+        bool is_cursor = board->cursor_pos[0] == i && board->cursor_pos[1] == row;
+        attron(A_BOLD);
+        attron(COLOR_PAIR(2));
+        if (!is_cursor)
+        {
+            attron(COLOR_PAIR(1));
+        }
+        if (!is_clue_pos(board, i, row))
+        {
+            attroff(A_BOLD);
+        }
+        int cur_cell = board_get_cell(board, i, row);
+        char cell_symbols[2][2] = { { cur_cell + '0', ' ' }, { cur_cell + '0', '=' } };
+        printw("%c ", cell_symbols[is_cursor][cur_cell == 0]);
+        attron(COLOR_PAIR(1));
         attroff(A_BOLD);
-        int cell_number = board_get_cell(board, i, row);
-        cell_number != 0 ? printw("%d ", cell_number) : printw("  ");
     }
     attron(A_BOLD);
     printw("|\n");

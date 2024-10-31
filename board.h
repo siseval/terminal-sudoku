@@ -19,6 +19,9 @@ struct board
     int* row_statuses;
     int* box_statuses;
 
+    int** clues_positions;
+    int num_clues;
+
     int cursor_pos[2];
 
     int* cells;
