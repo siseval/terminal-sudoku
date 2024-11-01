@@ -1,5 +1,10 @@
 #include "board.h"
 
+static void print_row(const struct board* board, const int row);
+static void print_hor_line(const struct board* board, const bool is_hor_edge);
+static bool is_clue_pos(const struct board* board, const int col, const int row);
+static bool is_out_of_bounds(const int col, const int row, const int bounds_x, const int bounds_y);
+
 struct board* board_create(const int box_dimensions)
 {
     struct board* board = calloc(1, sizeof(struct board));
@@ -95,12 +100,14 @@ void board_generate_puzzle(struct board* board, const int num_clues)
         }
         board->cells[cell_index] = 0;
     }
+    int clues_counted = 0;
     for (int i = 0; i < board->width * board->height; i++)
     {
         if (board->cells[i] != 0)
         {
-            board->clues_positions[i][0] = i % board->width;
-            board->clues_positions[i][1] = i / board->width;
+            board->clues_positions[clues_counted * 2] = i % board->width;
+            board->clues_positions[clues_counted * 2 + 1] = i / board->width;
+            clues_counted++;
         }
     }
 
@@ -301,7 +308,12 @@ void board_set_box_cell(struct board* board, const int box_x, const int box_y, c
 
 bool board_try_set_cell(struct board* board, const int col, const int row, const int value)
 {
-
+    if (!is_clue_pos(board, col, row))
+    {
+        board_set_cell(board, col, row, value);
+        return true;
+    }
+    return false;
 }
 
 void board_move_cursor(struct board* board, const int dx, const int dy)
@@ -344,7 +356,7 @@ static bool is_clue_pos(const struct board* board, const int col, const int row)
 {
     for (int i = 0; i < board->num_clues; i++)
     {
-        if (board->clues_positions[i][0] == col && board->clues_positions[i][1] == row)
+        if (board->clues_positions[i * 2] == col && board->clues_positions[i * 2 + 1] == row)
         {
             return true;
         }
@@ -362,17 +374,17 @@ static void print_row(const struct board* board, const int row)
             attron(A_BOLD);
         }
         printw("| ");
+        attroff(A_BOLD);
 
         bool is_cursor = board->cursor_pos[0] == i && board->cursor_pos[1] == row;
-        attron(A_BOLD);
-        attron(COLOR_PAIR(2));
-        if (!is_cursor)
+        bool is_clue = is_clue_pos(board, i, row);
+        if (is_cursor)
         {
-            attron(COLOR_PAIR(1));
+            attron(COLOR_PAIR(2));
         }
-        if (!is_clue_pos(board, i, row))
+        if (is_cursor || is_clue)
         {
-            attroff(A_BOLD);
+            attron(A_BOLD);
         }
         int cur_cell = board_get_cell(board, i, row);
         char cell_symbols[2][2] = { { cur_cell + '0', ' ' }, { cur_cell + '0', '=' } };

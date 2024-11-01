@@ -72,10 +72,10 @@ void handle_input(struct board* board)
         case '7':
         case '8':
         case '9':
-            board_set_cell(board, board->cursor_pos[0], board->cursor_pos[1], input - '0');
+            board_try_set_cell(board, board->cursor_pos[0], board->cursor_pos[1], input - '0');
             break;
         case ' ':
-            board_set_cell(board, board->cursor_pos[0], board->cursor_pos[1], 0);
+            board_try_set_cell(board, board->cursor_pos[0], board->cursor_pos[1], 0);
             break;
 
     }
