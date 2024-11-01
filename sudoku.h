@@ -8,6 +8,6 @@
 #include "board.h"
 #include "cli.h"
 
-void sudoku_run(int board_box_size);
+void sudoku_run(int board_box_size, int num_clues);
 
 #endif 

@@ -5,14 +5,12 @@
 static void init_curses();
 static void main_loop(struct board* board);
 static void handle_input(struct board* board);
-static void end_game(int board_box_size);
+static void end_game(int board_box_size, int num_clues);
 
 int main()
 {
     init_curses();        
     srand(time(NULL));
-
-    sudoku_run(3);
 
     endwin();
 }
@@ -31,15 +29,15 @@ static void init_curses(void)
     init_pair(2, COLOR_YELLOW, -1);
 }
 
-void sudoku_run(int board_box_size)
+void sudoku_run(int board_box_size, int num_clues)
 {
     struct board* board = board_create(board_box_size);
+    board_generate_puzzle(board, num_clues);
     main_loop(board);
 }
 
 static void main_loop(struct board* board)
 {
-    board_generate_puzzle(board, 15);
     board_print(board);
     while (true)
     {
@@ -47,14 +45,31 @@ static void main_loop(struct board* board)
         board_print(board);
         if (board_is_solved(board))
         {
-            end_game(board->box_width);
+            end_game(board->box_width, board->num_clues);
             board_destroy(board);
             return;
         }
     }
 }
 
-static void end_game(int board_box_size)
+static void main_menu()
+{
+    struct cli_button small_button = {"Small (4x4)"};
+    struct cli_button standard_button = {"Standard (9x9)"};
+    struct cli_button large_button = {"Large (16x16)"};
+    struct cli_menu size_menu = {"=: Select Board Size :=", ":: ", " ::", 2, 1, true, false, 3, 0, small_button, standard_button, large_button};
+
+    int size_menu_gaps[] = { 3, 2, 2 };
+
+    int size_selection = 2 + cli_menu_run(&size_menu, size_menu_gaps, -cli_menu_get_height(size_menu, size_menu_gaps) / 2, true);
+     
+    struct cli_button easy_button = {"Easy ( clues)"};
+    struct cli_button medium_button = {"Medium (20 clues)"};
+    struct cli_button hard_button = {"Hard (30 clues)"};
+    struct cli_menu difficulty_menu = {"=: Select Difficulty :=", ":: ", " ::", 2, 1, true, false, 3, 0, easy_button, medium_button, hard_button};
+}
+
+static void end_game(int board_box_size, int num_clues)
 {
     clear(); 
 
@@ -81,7 +96,7 @@ static void end_game(int board_box_size)
         exit(0);
     }
 
-    selection == 0 ? sudoku_run(board_box_size) : sudoku_run(board_box_size);
+    selection == 0 ? sudoku_run(board_box_size, num_clues) : sudoku_run(board_box_size, num_clues);
 }
 
 static void handle_input(struct board* board)
