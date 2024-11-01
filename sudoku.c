@@ -1,17 +1,17 @@
 #include "sudoku.h"
-#include <curses.h>
 
 
 static void init_curses();
 static void main_loop(struct board* board);
+static void print_top_bar(time_t timer_seconds, int board_height);
 static void handle_input(struct board* board);
-static void end_game(int board_box_size, int num_clues);
+static void end_game(int board_box_size, int num_clues, time_t time_seconds);
 static void main_menu();
 static void quit();
 
 int main()
 {
-    init_curses();        
+    init_curses();
     srand(time(NULL));
 
     main_menu();
@@ -49,18 +49,35 @@ static void quit(void)
 
 static void main_loop(struct board* board)
 {
+    time_t start_time = time(NULL);
+
     board_print(board);
+    print_top_bar(0, board->height);
     while (true)
     {
+        time_t timer_seconds = time(NULL) - start_time;
+
         handle_input(board);
         board_print(board);
+        print_top_bar(timer_seconds, board->height);
         if (board_is_solved(board))
         {
-            end_game(board->box_width, board->num_clues);
+            end_game(board->box_width, board->num_clues, timer_seconds);
             board_destroy(board);
             return;
         }
     }
+}
+
+static void print_top_bar(time_t timer_seconds, int board_height)
+{
+    attron(A_BOLD);
+    char top_text[32];
+    sprintf(top_text, "- Time: %ds -", (int)timer_seconds);
+    cli_move_center_v(-board_height - 1);
+    cli_move_center_h(-strlen(top_text) / 2 + 1);
+    printw(top_text);
+    attroff(A_BOLD);
 }
 
 static void main_menu()
@@ -114,12 +131,17 @@ static void main_menu()
     sudoku_run(2 + size_selection, num_clues_map[size_selection][difficulty_selection]);
 }
 
-static void end_game(int board_box_size, int num_clues)
+static void end_game(int board_box_size, int num_clues, time_t time_seconds)
 {
     clear(); 
 
     int num_labels = 1;
-    struct cli_button time_label = { "Time: 0:00:00" };
+
+    char time_text[32];
+    sprintf(time_text, "Time: %ds", (int)time_seconds);
+    struct cli_button time_label = { "" };
+    strcpy(time_label.text, time_text);
+
     struct cli_menu end_screen = { "=: You Win :=", "- ", " -", 1, 1, true, false, num_labels, 0, time_label };
 
     int label_gaps[] = { 4 };
@@ -183,7 +205,9 @@ static void handle_input(struct board* board)
         case ' ':
             board_try_set_cell(board, board->cursor_pos[0], board->cursor_pos[1], 0);
             break;
-
+        case '-':
+            board_solve_puzzle(board);
+            break;
     }
 }
 

@@ -45,6 +45,34 @@ void board_destroy(struct board* board)
 
 void board_generate_puzzle(struct board* board, const int num_clues)
 {
+    board_solve_puzzle(board);
+
+    for (int i = 0; i < board->width * board->height - num_clues; i++)
+    {
+        int cell_index = -1; 
+        while (cell_index == -1)
+        {
+            int candidate_index = rand() % (board->width * board->height);
+            cell_index = board->cells[candidate_index] != 0 ? candidate_index : -1;
+        }
+        board->cells[cell_index] = 0;
+    }
+    int clues_counted = 0;
+    for (int i = 0; i < board->width * board->height; i++)
+    {
+        if (board->cells[i] != 0)
+        {
+            board->clues_positions[clues_counted * 2] = i % board->width;
+            board->clues_positions[clues_counted * 2 + 1] = i / board->width;
+            clues_counted++;
+        }
+    }
+
+    board->num_clues = num_clues;
+}
+
+void board_solve_puzzle(struct board* board)
+{
     int nums_tried[board->width * board->height];
     memset(nums_tried, 0, sizeof(int) * board->width * board->height);
 
@@ -92,29 +120,6 @@ void board_generate_puzzle(struct board* board, const int num_clues)
 
         cell_index++;
     }
-
-    for (int i = 0; i < board->width * board->height - num_clues; i++)
-    {
-        int cell_index = -1; 
-        while (cell_index == -1)
-        {
-            int candidate_index = rand() % (board->width * board->height);
-            cell_index = board->cells[candidate_index] != 0 ? candidate_index : -1;
-        }
-        board->cells[cell_index] = 0;
-    }
-    int clues_counted = 0;
-    for (int i = 0; i < board->width * board->height; i++)
-    {
-        if (board->cells[i] != 0)
-        {
-            board->clues_positions[clues_counted * 2] = i % board->width;
-            board->clues_positions[clues_counted * 2 + 1] = i / board->width;
-            clues_counted++;
-        }
-    }
-
-    board->num_clues = num_clues;
 }
 
 
@@ -394,7 +399,7 @@ static void print_row(const struct board* board, const int row)
             attron(A_BOLD);
         }
         int cur_cell = board_get_cell(board, i, row);
-        char cell_symbols_map[2][2] = { { cur_cell + '0', ' ' }, { cur_cell + '0', '=' } };
+        char cell_symbols_map[2][2] = { { cur_cell + '0', ' ' }, { cur_cell + '0', '+' } };
         printw("%c ", cell_symbols_map[is_cursor][cur_cell == 0]);
         attron(COLOR_PAIR(1));
         attroff(A_BOLD);

@@ -31,6 +31,7 @@ struct board* board_create(const int box_dimensions);
 void board_destroy(struct board* board);
 
 void board_generate_puzzle(struct board* board, const int num_clues);
+void board_solve_puzzle(struct board* board);
 
 bool board_is_solved(struct board* board);
 void board_update_statuses(struct board* board);
