@@ -1,5 +1,7 @@
 #include "board.h"
 
+static int board_highest_status(struct board* board);
+static int board_lowest_status(struct board* board);
 static void print_row(const struct board* board, const int row);
 static void print_hor_line(const struct board* board, const bool is_hor_edge);
 static bool is_clue_pos(const struct board* board, const int col, const int row);
@@ -115,7 +117,7 @@ void board_generate_puzzle(struct board* board, const int num_clues)
 }
 
 
-int board_highest_status(struct board* board)
+static int board_highest_status(struct board* board)
 {
     board_update_statuses(board);
     int highest = -1;
@@ -146,7 +148,7 @@ int board_highest_status(struct board* board)
     return highest;
 }
 
-int board_lowest_status(struct board* board)
+static int board_lowest_status(struct board* board)
 {
     board_update_statuses(board);
     int lowest = 1;
@@ -177,6 +179,10 @@ int board_lowest_status(struct board* board)
     return lowest;
 }
 
+bool board_is_solved(struct board* board)
+{
+    return board_lowest_status(board) == 1;
+}
 
 void board_update_statuses(struct board* board)
 {
@@ -184,7 +190,7 @@ void board_update_statuses(struct board* board)
     {
         board->col_statuses[i] = board_col_status(board, i);
         board->row_statuses[i] = board_row_status(board, i);
-        board->box_statuses[i] = board_box_status(board, i % 3, i / 3);
+        board->box_statuses[i] = board_box_status(board, i % board->box_width, i / board->box_width);
     }
 }
 

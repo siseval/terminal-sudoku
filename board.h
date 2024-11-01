@@ -32,9 +32,7 @@ void board_destroy(struct board* board);
 
 void board_generate_puzzle(struct board* board, const int num_clues);
 
-int board_highest_status(struct board* board);
-int board_lowest_status(struct board* board);
-
+bool board_is_solved(struct board* board);
 void board_update_statuses(struct board* board);
 int board_col_status(const struct board* board, const int col);
 int board_row_status(const struct board* board, const int row);

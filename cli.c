@@ -1,67 +1,67 @@
 #include "cli.h"
 
-void draw_button(const struct button b, const struct menu m, const int col)
+void cli_menu_button_draw(const struct cli_button button, const struct cli_menu menu, const int col)
 {
     attron(COLOR_PAIR(col));
   
-    move_center_h(-((int)(strlen(b.text) + strlen(m.left) + strlen(m.right)) / 2));
-    printw("%s%s%s\n\r", m.left, b.text, m.right);
+    cli_move_center_h(-((int)(strlen(button.text) + strlen(menu.left) + strlen(menu.right)) / 2));
+    printw("%s%s%s\n\r", menu.left, button.text, menu.right);
 
     attroff(COLOR_PAIR(col));
 }
 
-void draw_buttons(const struct menu m, const int gaps[])
+void cli_menu_draw_buttons(const struct cli_menu menu, const int gaps[])
 {
-    for (int i = 0; i < m.num_buttons; i++) 
+    for (int i = 0; i < menu.num_buttons; i++) 
     {
-        const struct button b = m.buttons[i];
+        const struct cli_button b = menu.buttons[i];
         for (int j = 0; j < gaps[i]; j++) 
         {
             printw("\n");
         }
-        draw_button(b, m, m.selected == i ? m.selected_col : m.normal_col);
+        cli_menu_button_draw(b, menu, menu.selected == i ? menu.selected_col : menu.normal_col);
     }
 }
 
-int do_menu(struct menu *m, int gaps[], int dy, bool clear_screen)
+int cli_menu_display(struct cli_menu *menu, int gaps[], int dy, bool clear_screen)
 {
-    m->bold ? attron(A_BOLD) : attroff(A_BOLD);
-    int selection = m->selected;
-    while (!m->has_selected)
+    menu->bold ? attron(A_BOLD) : attroff(A_BOLD);
+    int selection = menu->selected;
+    while (!menu->has_selected)
     {
         if (clear_screen)
         {
             clear();
         }
-        move_center_v(-(get_height(*m, gaps) / 2) + dy);
-        move_center_h(-(strlen(m->top_text) / 2));
+        cli_move_center_v(-(cli_menu_get_height(*menu, gaps) / 2) + dy);
+        cli_move_center_h(-(strlen(menu->top_text) / 2));
 
-        printw("%s", m->top_text);
-        draw_buttons(*m, gaps);
+        printw("%s", menu->top_text);
+        cli_menu_draw_buttons(*menu, gaps);
 
-        selection = menu_input(m);
+        selection = cli_menu_handle_input(menu);
     }
     attroff(A_BOLD);
     return selection;
 }
 
-void print_as_labels(struct menu m, int gaps[], int dy, bool clear_screen)
+void cli_menu_display_labels(struct cli_menu menu, int gaps[], int dy, bool clear_screen)
 {
-    m.bold ? attron(A_BOLD) : attroff(A_BOLD);
+    menu.bold ? attron(A_BOLD) : attroff(A_BOLD);
 
     if (clear_screen)
     {
         clear();
     }
 
-    move_center_v(-(get_height(m, gaps) / 2) + dy);
-    move_center_h(-(strlen(m.top_text) / 2));
+    cli_move_center_v(-(cli_menu_get_height(menu, gaps) / 2) + dy);
+    cli_move_center_h(-(strlen(menu.top_text) / 2));
 
-    printw("%s", m.top_text);
-    draw_buttons(m, gaps);
+    printw("%s", menu.top_text);
+    cli_menu_draw_buttons(menu, gaps);
 }
 
-int get_height(struct menu m, int gaps[])
+int cli_menu_get_height(struct cli_menu m, int gaps[])
 {
     int height = m.num_buttons + 1;
     for (int i = 0; i < m.num_buttons; i++)
@@ -71,68 +71,68 @@ int get_height(struct menu m, int gaps[])
     return height;
 }
 
-struct button get_button(struct menu m, int i) 
+struct cli_button cli_menu_get_button(struct cli_menu menu, int index) 
 {
-    return m.buttons[i]; 
+    return menu.buttons[index]; 
 }
 
-int menu_input(struct menu *m) 
+int cli_menu_handle_input(struct cli_menu *menu) 
 {
     switch (getch()) 
     {
     case 'k':
     case 'w':
-        m->selected -= m->selected <= 0 ? 0 : 1;
+        menu->selected -= menu->selected <= 0 ? 0 : 1;
         break;
 
     case 'j':
     case 's':
-        m->selected += m->selected >= m->num_buttons - 1 ? 0 : 1;
+        menu->selected += menu->selected >= menu->num_buttons - 1 ? 0 : 1;
         break;
 
     case ' ':
     case 'f':
     case K_ENTER:
-        m->has_selected = true;
+        menu->has_selected = true;
         break;
     }
-    return m->selected;
+    return menu->selected;
 }
 
-int get_cur_x()
+int cli_get_cur_x()
 {
     int y, x;
     getyx(stdscr, y, x);
     return x;
 }
 
-int get_cur_y()
+int cli_get_cur_y()
 {
     int y, x;
     getyx(stdscr, y, x);
     return y;
 }
 
-int get_scrw()
+int cli_get_scrw()
 {
     int scrh, scrw;
     getmaxyx(stdscr, scrh, scrw);
     return scrw;
 }
 
-int get_scrh()
+int cli_get_scrh()
 {
     int scrh, scrw;
     getmaxyx(stdscr, scrh, scrw);
     return scrh;
 }
 
-void move_center_v(const int dy)
+void cli_move_center_v(const int dy)
 {
-    move(get_scrh() / 2 + dy, get_cur_x());
+    move(cli_get_scrh() / 2 + dy, cli_get_cur_x());
 }
 
-void move_center_h(const int dx)
+void cli_move_center_h(const int dx)
 {
-    move(get_cur_y(), get_scrw() / 2 + dx);
+    move(cli_get_cur_y(), cli_get_scrw() / 2 + dx);
 }

@@ -7,11 +7,6 @@
 #include <time.h>
 #include "board.h"
 
-void init_curses();
-
 void run();
-void main_loop(struct board* board);
-
-void handle_input(struct board* board);
 
 #endif 

@@ -27,18 +27,22 @@ void init_curses()
 
 void run()
 {
-    struct board* board = board_create(3);
+    struct board* board = board_create(2);
     main_loop(board);
 }
 
 void main_loop(struct board* board)
 {
-    board_generate_puzzle(board, 21);
+    board_generate_puzzle(board, 3);
     board_print(board);
     while (true)
     {
         handle_input(board);
         board_print(board);
+        if (board_is_solved(board))
+        {
+            exit(0);
+        }
     }
 }
 
