@@ -9,14 +9,14 @@
 
 struct cli_button 
 {
-    char *text;
+    char text[32];
 };
 
 struct cli_menu 
 {
-    char* top_text;
-    char *left;
-    char *right;
+    char top_text[32];
+    char left[32];
+    char right[32];
     int selected_col;
     int normal_col;
     bool bold;     
@@ -26,15 +26,15 @@ struct cli_menu
     struct cli_button buttons[20];
 };
 
-struct cli_button cli_menu_get_button(struct cli_menu menu, int index);
+struct cli_button cli_menu_get_button(const struct cli_menu menu, const int index);
 
-void cli_menu_button_draw(struct cli_button button, struct cli_menu menu, int col);
-void cli_menu_draw_buttons(struct cli_menu menu, const int gaps[]);
-int cli_menu_display(struct cli_menu *menu, int gaps[], int dy, bool clear_screen);
+void cli_menu_button_draw(const struct cli_button button, const struct cli_menu menu, const int col);
+void cli_menu_draw_buttons(const struct cli_menu menu, const int gaps[]);
+int cli_menu_run(struct cli_menu *menu, const int gaps[], const int dy, const bool clear_screen);
 
-void cli_menu_display_labels(struct cli_menu menu, int gaps[], int dy, bool clear_screen);
+void cli_menu_display_labels(const struct cli_menu menu, const int gaps[], const int dy, const bool clear_screen);
 
-int cli_menu_get_height(struct cli_menu menu, int gaps[]);
+int cli_menu_get_height(const struct cli_menu menu, const int gaps[]);
 
 int cli_menu_handle_input(struct cli_menu *menu);
 

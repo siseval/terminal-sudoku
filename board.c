@@ -38,6 +38,7 @@ void board_destroy(struct board* board)
     free(board->col_statuses);
     free(board->row_statuses);
     free(board->box_statuses);
+    free(board->clues_positions);
     free(board);
 }
 
@@ -335,7 +336,7 @@ void board_move_cursor(struct board* board, const int dx, const int dy)
 
 static void print_hor_line(const struct board* board, const bool is_hor_edge)
 {
-    move_center_h(-((board->width * 4 + 1) / 2));
+    cli_move_center_h(-((board->width * 4 + 1) / 2));
     for (int i = 0; i < board->width; i++)
     {
         bool is_vert_edge = i % board->box_width == 0;
@@ -372,7 +373,7 @@ static bool is_clue_pos(const struct board* board, const int col, const int row)
 
 static void print_row(const struct board* board, const int row)
 {
-    move_center_h(-((board->width * 4 + 1) / 2));
+    cli_move_center_h(-((board->width * 4 + 1) / 2));
     for (int i = 0; i < board->width; i++)
     {
         if (i % board->box_width == 0) 
@@ -407,7 +408,7 @@ void board_print(const struct board* board)
 {
     clear();
     attron(COLOR_PAIR(1));
-    move_center_v(-((board->height * 2 + 1) / 2));
+    cli_move_center_v(-((board->height * 2 + 1) / 2));
     for (int i = 0; i < board->height; i++)
     {
         print_hor_line(board, i % board->box_height == 0);

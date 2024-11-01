@@ -6,7 +6,8 @@
 #include <curses.h>
 #include <time.h>
 #include "board.h"
+#include "cli.h"
 
-void run();
+void sudoku_run(int board_box_size);
 
 #endif 

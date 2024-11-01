@@ -23,7 +23,7 @@ void cli_menu_draw_buttons(const struct cli_menu menu, const int gaps[])
     }
 }
 
-int cli_menu_display(struct cli_menu *menu, int gaps[], int dy, bool clear_screen)
+int cli_menu_run(struct cli_menu *menu, const int gaps[], const int dy, const bool clear_screen)
 {
     menu->bold ? attron(A_BOLD) : attroff(A_BOLD);
     int selection = menu->selected;
@@ -45,7 +45,7 @@ int cli_menu_display(struct cli_menu *menu, int gaps[], int dy, bool clear_scree
     return selection;
 }
 
-void cli_menu_display_labels(struct cli_menu menu, int gaps[], int dy, bool clear_screen)
+void cli_menu_display_labels(const struct cli_menu menu, const int gaps[], const int dy, const bool clear_screen)
 {
     menu.bold ? attron(A_BOLD) : attroff(A_BOLD);
 
@@ -61,7 +61,7 @@ void cli_menu_display_labels(struct cli_menu menu, int gaps[], int dy, bool clea
     cli_menu_draw_buttons(menu, gaps);
 }
 
-int cli_menu_get_height(struct cli_menu m, int gaps[])
+int cli_menu_get_height(const struct cli_menu m, const int gaps[])
 {
     int height = m.num_buttons + 1;
     for (int i = 0; i < m.num_buttons; i++)
@@ -71,7 +71,7 @@ int cli_menu_get_height(struct cli_menu m, int gaps[])
     return height;
 }
 
-struct cli_button cli_menu_get_button(struct cli_menu menu, int index) 
+struct cli_button cli_menu_get_button(const struct cli_menu menu, const int index) 
 {
     return menu.buttons[index]; 
 }
@@ -99,28 +99,28 @@ int cli_menu_handle_input(struct cli_menu *menu)
     return menu->selected;
 }
 
-int cli_get_cur_x()
+int cli_get_cur_x(void)
 {
     int y, x;
     getyx(stdscr, y, x);
     return x;
 }
 
-int cli_get_cur_y()
+int cli_get_cur_y(void)
 {
     int y, x;
     getyx(stdscr, y, x);
     return y;
 }
 
-int cli_get_scrw()
+int cli_get_scrw(void)
 {
     int scrh, scrw;
     getmaxyx(stdscr, scrh, scrw);
     return scrw;
 }
 
-int cli_get_scrh()
+int cli_get_scrh(void)
 {
     int scrh, scrw;
     getmaxyx(stdscr, scrh, scrw);
