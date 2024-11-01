@@ -315,7 +315,7 @@ void board_set_box_cell(struct board* board, const int box_x, const int box_y, c
 
 bool board_try_set_cell(struct board* board, const int col, const int row, const int value)
 {
-    if (!is_clue_pos(board, col, row))
+    if (!is_clue_pos(board, col, row) && value <= board->width)
     {
         board_set_cell(board, col, row, value);
         return true;
@@ -394,8 +394,8 @@ static void print_row(const struct board* board, const int row)
             attron(A_BOLD);
         }
         int cur_cell = board_get_cell(board, i, row);
-        char cell_symbols[2][2] = { { cur_cell + '0', ' ' }, { cur_cell + '0', '=' } };
-        printw("%c ", cell_symbols[is_cursor][cur_cell == 0]);
+        char cell_symbols_map[2][2] = { { cur_cell + '0', ' ' }, { cur_cell + '0', '=' } };
+        printw("%c ", cell_symbols_map[is_cursor][cur_cell == 0]);
         attron(COLOR_PAIR(1));
         attroff(A_BOLD);
     }
