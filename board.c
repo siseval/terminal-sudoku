@@ -1,7 +1,7 @@
 #include "board.h"
 
-static int board_highest_status(struct board* board);
-static int board_lowest_status(struct board* board);
+static int highest_status(struct board* board);
+static int lowest_status(struct board* board);
 static void print_row(const struct board* board, const int row);
 static void print_hor_line(const struct board* board, const bool is_hor_edge);
 static bool is_clue_pos(const struct board* board, const int col, const int row);
@@ -123,7 +123,7 @@ void board_solve_puzzle(struct board* board)
 }
 
 
-static int board_highest_status(struct board* board)
+static int highest_status(struct board* board)
 {
     board_update_statuses(board);
     int highest = -1;
@@ -154,7 +154,7 @@ static int board_highest_status(struct board* board)
     return highest;
 }
 
-static int board_lowest_status(struct board* board)
+static int lowest_status(struct board* board)
 {
     board_update_statuses(board);
     int lowest = 1;
@@ -187,7 +187,7 @@ static int board_lowest_status(struct board* board)
 
 bool board_is_solved(struct board* board)
 {
-    return board_lowest_status(board) == 1;
+    return lowest_status(board) == 1;
 }
 
 void board_update_statuses(struct board* board)
@@ -337,6 +337,11 @@ void board_move_cursor(struct board* board, const int dx, const int dy)
     board->cursor_pos[1] += dy;
 }
 
+void board_toggle_show_mistakes(struct board* board)
+{
+    board->show_mistakes = !board->show_mistakes;
+}
+
 
 static void print_hor_line(const struct board* board, const bool is_hor_edge)
 {
@@ -388,10 +393,15 @@ static void print_row(const struct board* board, const int row)
         attroff(A_BOLD);
 
         bool is_cursor = board->cursor_pos[0] == i && board->cursor_pos[1] == row;
+        bool show_mistake = board->show_mistakes && board_cell_lowest_status(board, i, row) == -1;
         bool is_clue = is_clue_pos(board, i, row);
         if (is_cursor)
         {
             attron(COLOR_PAIR(2));
+        }
+        else if (show_mistake)
+        {
+            attron(COLOR_PAIR(3));
         }
         if (is_cursor || !is_clue)
         {

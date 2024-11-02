@@ -1,4 +1,5 @@
 #include "sudoku.h"
+#include "board.h"
 
 
 static void init_curses();
@@ -31,6 +32,8 @@ static void init_curses(void)
     use_default_colors();
     init_pair(1, COLOR_WHITE, -1);
     init_pair(2, COLOR_YELLOW, -1);
+    init_pair(3, COLOR_RED, -1);
+    init_pair(4, COLOR_GREEN, -1);
 }
 
 void sudoku_run(int board_box_size, int num_clues)
@@ -190,6 +193,9 @@ static void handle_input(struct board* board)
         case 'j':
         case 's':
             board_move_cursor(board, 0, 1);
+            break;
+        case 'm':
+            board_toggle_show_mistakes(board);
             break;
         case '1':
         case '2':

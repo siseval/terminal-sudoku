@@ -19,6 +19,8 @@ struct board
     int* row_statuses;
     int* box_statuses;
 
+    bool show_mistakes;
+
     int* clues_positions;
     int num_clues;
 
@@ -48,6 +50,7 @@ void board_set_box_cell(struct board* board, const int box_x, const int box_y, c
 bool board_try_set_cell(struct board* board, const int col, const int row, const int value);
 
 void board_move_cursor(struct board* board, const int dx, const int dy);
+void board_toggle_show_mistakes(struct board* board);
 
 void board_print(const struct board* board);
 
