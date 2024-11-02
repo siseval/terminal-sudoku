@@ -99,7 +99,7 @@ int cli_menu_handle_input(struct cli_menu *menu)
     return menu->selected;
 }
 
-int cli_get_cur_x(void)
+int cli_get_cur_x()
 {
     int y, x;
     getyx(stdscr, y, x);

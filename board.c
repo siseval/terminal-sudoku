@@ -49,13 +49,14 @@ void board_generate_puzzle(struct board* board, const int num_clues)
 
     for (int i = 0; i < board->width * board->height - num_clues; i++)
     {
+        int box_index = (i + rand() % 2) % board->width;
         int cell_index = -1; 
         while (cell_index == -1)
         {
-            int candidate_index = rand() % (board->width * board->height);
-            cell_index = board->cells[candidate_index] != 0 ? candidate_index : -1;
+            int candidate_index = rand() % (board->width);
+            cell_index = board_get_box_cell(board, box_index % board->box_width, box_index / board->box_width, candidate_index % board->box_width, candidate_index / board->box_width) != 0 ? candidate_index : -1;
         }
-        board->cells[cell_index] = 0;
+        board_set_box_cell(board, box_index % board->box_width, box_index / board->box_width, cell_index % board->box_width, cell_index / board->box_width, 0);
     }
     int clues_counted = 0;
     for (int i = 0; i < board->width * board->height; i++)
@@ -67,7 +68,6 @@ void board_generate_puzzle(struct board* board, const int num_clues)
             clues_counted++;
         }
     }
-
     board->num_clues = num_clues;
 }
 
@@ -211,7 +211,6 @@ int board_cell_lowest_status(const struct board* board, const int col, const int
     if (row_status < lowest) { lowest = row_status; }
     if (box_status < lowest) { lowest = box_status; }
     return lowest;
-
 }
 
 int board_col_status(const struct board* board, const int col)
@@ -394,7 +393,7 @@ static void print_row(const struct board* board, const int row)
         {
             attron(COLOR_PAIR(2));
         }
-        if (is_cursor || is_clue)
+        if (is_cursor || !is_clue)
         {
             attron(A_BOLD);
         }

@@ -88,7 +88,7 @@ static void main_menu()
 
     struct cli_menu size_menu = {"=: Select Board Size :=", ":: ", " ::", 2, 1, true, false, 3, 0, small_button, standard_button, quit_button};
 
-    int size_menu_gaps[] = { 4, 2, 3};
+    int size_menu_gaps[] = { 4, 2, 3 };
 
     int size_selection = cli_menu_run(&size_menu, size_menu_gaps, -2, true);
 
