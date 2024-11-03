@@ -71,6 +71,18 @@ void board_generate_puzzle(struct board* board, const int num_clues)
     board->num_clues = num_clues;
 }
 
+static void randomize_check_order(int* check_order, const int array_length)
+{
+    for (int i = 0; i < array_length * 3; i++)
+    {
+        int pos1 = rand() % array_length;
+        int pos2 = rand() % array_length;
+        int buf = check_order[pos1];
+        check_order[pos1] = check_order[pos2];
+        check_order[pos2] = buf;
+    }
+}
+
 void board_solve_puzzle(struct board* board)
 {
     int nums_tried[board->width * board->height];
@@ -81,23 +93,16 @@ void board_solve_puzzle(struct board* board)
     {
         check_order[i - 1] = i;
     }
+    randomize_check_order(check_order, board->width);
 
     int cell_index = 0;
     while (cell_index < board->width * board->height)
     {
-        for (int i = 0; i < board->width * 3; i++)
-        {
-            int pos1 = rand() % board->width;
-            int pos2 = rand() % board->width;
-            int buf = check_order[pos1];
-            check_order[pos1] = check_order[pos2];
-            check_order[pos2] = buf;
-        }
-
         bool all_tried = nums_tried[cell_index] == board->width;
 
         if (all_tried)
         {
+            randomize_check_order(check_order, board->width);
             nums_tried[cell_index] = 0;
             board->cells[cell_index] = 0;
             if (cell_index > 0)
