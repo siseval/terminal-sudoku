@@ -432,7 +432,6 @@ static void print_row(const struct board* board, const int row)
 void board_print(const struct board* board)
 {
     clear();
-    attron(COLOR_PAIR(1));
     cli_move_center_v(-((board->height * 2 + 1) / 2));
     for (int i = 0; i < board->height; i++)
     {
