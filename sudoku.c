@@ -4,6 +4,7 @@
 
 static void init_curses();
 static void main_loop(struct board* board);
+static int int_length(int value);
 static void print_top_bar(time_t timer_seconds, int board_height);
 static void handle_input(struct board* board);
 static void end_game(int board_box_size, int num_clues, time_t time_seconds);
@@ -72,11 +73,23 @@ static void main_loop(struct board* board)
     }
 }
 
+
+static int int_length(int value)
+{
+    int length = 1;
+    while (value > 9) 
+    {
+        length++;
+        value /= 10;
+    }
+    return length;
+}
+
 static void print_top_bar(time_t timer_seconds, int board_height)
 {
     attron(A_BOLD);
     char top_text[32];
-    sprintf(top_text, "- Time: %ds -", (int)timer_seconds);
+    sprintf(top_text, int_length(timer_seconds) % 2 == 0 ? "- Time: %ds -" : "- Time:  %ds -", (int)timer_seconds);
     cli_move_center_v(-board_height - 1);
     cli_move_center_h(-strlen(top_text) / 2 + 1);
     printw(top_text);
