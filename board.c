@@ -397,24 +397,30 @@ static void print_row(const struct board* board, const int row)
         printw("| ");
         attroff(A_BOLD);
 
+        int cur_cell = board_get_cell(board, i, row);
         bool is_cursor = board->cursor_pos[0] == i && board->cursor_pos[1] == row;
-        bool show_mistake = board->show_mistakes && board_cell_lowest_status(board, i, row) == -1;
+        bool is_mistake = board_cell_lowest_status(board, i, row) == -1;
         bool is_clue = is_clue_pos(board, i, row);
-        if (is_cursor)
-        {
-            attron(COLOR_PAIR(2));
-        }
-        else if (show_mistake)
-        {
-            attron(COLOR_PAIR(3));
-        }
+        bool is_empty = cur_cell == 0;
+        char cell_symbol = is_empty ? ' ' : cur_cell + '0';
+
         if (is_cursor || !is_clue)
         {
             attron(A_BOLD);
         }
-        int cur_cell = board_get_cell(board, i, row);
-        char cell_symbols_map[2][2] = { { cur_cell + '0', ' ' }, { cur_cell + '0', '+' } };
-        printw("%c ", cell_symbols_map[is_cursor][cur_cell == 0]);
+
+        if (is_cursor)
+        {
+            attron(COLOR_PAIR(2));
+            cell_symbol = is_empty ? '+' : cell_symbol;
+        }
+        else if (is_mistake && board->show_mistakes)
+        {
+            attron(COLOR_PAIR(3));
+            cell_symbol = is_empty ? '/' : cell_symbol;
+        }
+
+        printw("%c ", cell_symbol);
         attron(COLOR_PAIR(1));
         attroff(A_BOLD);
     }

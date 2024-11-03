@@ -220,12 +220,14 @@ static void handle_input(struct board* board)
         case '8':
         case '9':
             board_try_set_cell(board, board->cursor_pos[0], board->cursor_pos[1], input - '0');
+            board_update_statuses(board);
             break;
         case ' ':
             board_try_set_cell(board, board->cursor_pos[0], board->cursor_pos[1], 0);
+            board_update_statuses(board);
             break;
         case '-':
-            board_solve_puzzle(board);
+            // board_solve_puzzle(board);
             break;
     }
 }
